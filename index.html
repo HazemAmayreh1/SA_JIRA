@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام تعارضات قاعات الامتحان</title>
+    <!-- Font Awesome للأيقونات -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- رأس الصفحة -->
+        <header class="header">
+            <h1><i class="fas fa-university"></i> نظام إدارة تعارضات قاعات الامتحان</h1>
+            <p class="subtitle">تسجيل وإدارة حالات تعارض قاعات الامتحانات للطلاب</p>
+        </header>
+
+        <div class="main-content">
+            <!-- لوحة التحكم -->
+            <div class="control-panel">
+                <div class="panel-header">
+                    <h2><i class="fas fa-sliders-h"></i> لوحة التحكم</h2>
+                </div>
+                <div class="panel-actions">
+                    <button id="saveJsonBtn" class="btn btn-secondary">
+                        <i class="fas fa-download"></i> حفظ البيانات كملف JSON
+                    </button>
+                    <button id="loadJsonBtn" class="btn btn-secondary">
+                        <i class="fas fa-upload"></i> تحميل بيانات من ملف JSON
+                    </button>
+                    <button id="clearDataBtn" class="btn btn-danger">
+                        <i class="fas fa-trash-alt"></i> مسح جميع البيانات
+                    </button>
+                </div>
+            </div>
+
+            <!-- نموذج إدخال البيانات -->
+            <section class="form-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-plus-circle"></i> إضافة حالة تعارض جديدة</h2>
+                </div>
+                <form id="conflictForm" class="conflict-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="date"><i class="far fa-calendar-alt"></i> التاريخ</label>
+                            <input type="date" id="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="session"><i class="fas fa-clock"></i> الجلسة</label>
+                            <input type="text" id="session" placeholder="أدخل اسم الجلسة (مثال: الصباحية الأولى)" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="studentId"><i class="fas fa-id-card"></i> رقم الطالب</label>
+                            <input type="text" id="studentId" placeholder="أدخل رقم الطالب" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="studentName"><i class="fas fa-user-graduate"></i> اسم الطالب</label>
+                            <input type="text" id="studentName" placeholder="أدخل اسم الطالب بالكامل" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="courseId"><i class="fas fa-book"></i> رقم المساق</label>
+                            <input type="text" id="courseId" placeholder="أدخل رقم المساق" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="courseName"><i class="fas fa-book-open"></i> اسم المساق</label>
+                            <input type="text" id="courseName" placeholder="أدخل اسم المساق" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="currentRoom"><i class="fas fa-door-closed"></i> القاعة الحالية</label>
+                            <input type="text" id="currentRoom" placeholder="أدخل رقم القاعة الحالية" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="proposedRoom"><i class="fas fa-door-open"></i> القاعة المقترحة</label>
+                            <input type="text" id="proposedRoom" placeholder="أدخل رقم القاعة المقترحة" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="supervisor"><i class="fas fa-user-tie"></i> اسم المراقب</label>
+                            <input type="text" id="supervisor" placeholder="أدخل اسم المراقب" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> إضافة الحالة
+                        </button>
+                        <button type="reset" class="btn btn-reset">
+                            <i class="fas fa-redo"></i> مسح الحقول
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- لوحة الفلترة المتقدمة -->
+            <section class="filter-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-filter"></i> فلترة البيانات المتقدمة</h2>
+                    <button id="resetFiltersBtn" class="btn btn-reset">
+                        <i class="fas fa-redo"></i> إعادة تعيين الفلترات
+                    </button>
+                </div>
+                
+                <div class="advanced-filters">
+                    <div class="filter-group">
+                        <div class="filter-option">
+                            <input type="radio" id="filterNone" name="filterType" value="none" checked>
+                            <label for="filterNone">بدون فلترة</label>
+                        </div>
+                        <div class="filter-option">
+                            <input type="radio" id="filterSession" name="filterType" value="session">
+                            <label for="filterSession">فلترة حسب الجلسة</label>
+                        </div>
+                        <div class="filter-option">
+                            <input type="radio" id="filterDate" name="filterType" value="date">
+                            <label for="filterDate">فلترة حسب اليوم</label>
+                        </div>
+                        <div class="filter-option">
+                            <input type="radio" id="filterSupervisor" name="filterType" value="supervisor">
+                            <label for="filterSupervisor">فلترة حسب المراقب</label>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-controls">
+                        <!-- فلترة الجلسة -->
+                        <div class="filter-control" id="sessionFilterControl">
+                            <label for="sessionFilterSelect"><i class="fas fa-clock"></i> اختيار الجلسة:</label>
+                            <select id="sessionFilterSelect">
+                                <option value="all">جميع الجلسات</option>
+                            </select>
+                        </div>
+                        
+                        <!-- فلترة التاريخ -->
+                        <div class="filter-control" id="dateFilterControl" style="display: none;">
+                            <label for="dateFilterSelect"><i class="far fa-calendar-alt"></i> اختيار اليوم:</label>
+                            <select id="dateFilterSelect">
+                                <option value="all">جميع الأيام</option>
+                            </select>
+                        </div>
+                        
+                        <!-- فلترة المراقب -->
+                        <div class="filter-control" id="supervisorFilterControl" style="display: none;">
+                            <label for="supervisorFilterSelect"><i class="fas fa-user-tie"></i> اختيار المراقب:</label>
+                            <select id="supervisorFilterSelect">
+                                <option value="all">جميع المراقبين</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-actions">
+                        <button id="applyFilterBtn" class="btn btn-primary">
+                            <i class="fas fa-filter"></i> تطبيق الفلتر
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- لوحة إنشاء التقارير -->
+            <section class="reports-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-file-pdf"></i> إنشاء تقارير PDF</h2>
+                </div>
+                <div class="reports-controls">
+                    <div class="report-buttons">
+                        <button id="printAllBtn" class="btn btn-primary">
+                            <i class="fas fa-print"></i> طباعة جميع البيانات
+                        </button>
+                        <button id="printFilteredBtn" class="btn btn-success">
+                            <i class="fas fa-file-export"></i> طباعة البيانات المصفاة
+                        </button>
+                        <button id="printAttendanceBtn" class="btn btn-info">
+                            <i class="fas fa-clipboard-check"></i> كشف الحضور
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- كشف الحضور -->
+                <div class="attendance-controls" style="margin-top: 15px;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="attendanceSession"><i class="fas fa-clock"></i> اختيار الجلسة:</label>
+                            <select id="attendanceSession" class="attendance-select">
+                                <option value="">-- اختر الجلسة --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="attendanceDate"><i class="far fa-calendar-alt"></i> التاريخ:</label>
+                            <input type="date" id="attendanceDate" class="attendance-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="attendanceSupervisor"><i class="fas fa-user-tie"></i> اسم المراقب:</label>
+                            <input type="text" id="attendanceSupervisor" class="attendance-input" placeholder="اسم المراقب">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- عرض البيانات -->
+            <section class="data-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-table"></i> البيانات المدخلة</h2>
+                    <div class="section-header-right">
+                        <span class="record-count" id="recordCount">0 سجل</span>
+                        <span class="filter-status" id="filterStatus"></span>
+                    </div>
+                </div>
+                
+                <!-- إحصائيات سريعة -->
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-users"></i></div>
+                        <div class="stat-info">
+                            <h3 id="totalStudents">0</h3>
+                            <p>إجمالي الطلاب</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-door-closed"></i></div>
+                        <div class="stat-info">
+                            <h3 id="totalConflicts">0</h3>
+                            <p>حالات التعارض</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                        <div class="stat-info">
+                            <h3 id="totalSessions">0</h3>
+                            <p>عدد الجلسات</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-user-tie"></i></div>
+                        <div class="stat-info">
+                            <h3 id="filteredCount">0</h3>
+                            <p>البيانات المصفاة</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- جدول البيانات -->
+                <div class="table-container">
+                    <table id="conflictsTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>التاريخ</th>
+                                <th>الجلسة</th>
+                                <th>رقم الطالب</th>
+                                <th>اسم الطالب</th>
+                                <th>رقم المساق</th>
+                                <th>اسم المساق</th>
+                                <th>القاعة الحالية</th>
+                                <th>القاعة المقترحة</th>
+                                <th>المراقب</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- سيتم ملؤها ديناميكياً -->
+                        </tbody>
+                    </table>
+                    <div id="noDataMessage" class="no-data-message">
+                        <i class="fas fa-info-circle"></i>
+                        <p>لا توجد بيانات مسجلة. الرجاء إضافة حالات تعارض جديدة.</p>
+                    </div>
+                    <div id="noFilterDataMessage" class="no-data-message" style="display: none;">
+                        <i class="fas fa-search"></i>
+                        <p>لا توجد نتائج تطابق معايير البحث المحددة.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- تذييل الصفحة -->
+        <footer class="footer">
+            <p>نظام تعارضات قاعات الامتحان &copy; <span id="currentYear"></span> | تم التطوير باستخدام HTML, CSS, JavaScript</p>
+            <p class="footer-note">جميع البيانات مخزنة محلياً على جهازك</p>
+        </footer>
+    </div>
+
+    <!-- عناصر مخفية للمساعدة في التحميل -->
+    <input type="file" id="jsonFileInput" accept=".json" style="display: none;">
+    
+    <!-- سكربت التطبيق -->
+    <script src="script.js"></script>
+</body>
+</html>
